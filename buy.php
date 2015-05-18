@@ -1,10 +1,15 @@
 <?php
+	// THis file mainly executes the SetExpressCheckout and passes on to the other files for the other tasks
 	require 'commonFunctions.php';
 	$postVar = $_POST["item"];
 	if ($postVar == "router" || $postVar == "internet")
 	{
 		$method = "SetExpressCheckout";
+
+		// Common properties like user name, password signature etc will be added in this function
 		$parameters = setCommonParameters($method);
+
+		// Add parameters which are different for both the cases
 		if ($postVar == "router")
 		{
 			$parameters['NOSHIPPING'] = '2';
@@ -18,9 +23,6 @@
 
                         $parameters['L_BILLINGTYPE0'] = 'MerchantInitiatedBilling';
                         $parameters['L_BILLINGAGREEMENTDESCRIPTION0'] = 'Router bill';
-
-			$returnURL = 'https://ec2-52-25-14-252.us-west-2.compute.amazonaws.com/confirm.php?item=' . $postVar;
-                        $parameters['RETURNURL'] = $returnURL;
 
 		}
 		else
@@ -36,17 +38,20 @@
 
                         $parameters['L_BILLINGTYPE0'] = 'RecurringPayments';
                         $parameters['L_BILLINGAGREEMENTDESCRIPTION0'] = 'SGD 25 per month for 1 year for one year for internet subscription';
-
-                        $returnURL = 'https://ec2-52-25-14-252.us-west-2.compute.amazonaws.com/confirm.php?item=' . $postVar;
-                        $parameters['RETURNURL'] = $returnURL;
-
 		}
+
+		// Add the common parameters
+                $returnURL = $HOME_URL . '/confirm.php?item=' . $postVar;
+                $parameters['RETURNURL'] = $returnURL;
+
 		$parameters['PAYMENTREQUEST_0_CURRENCYCODE'] = SGD;
 		$parameters['PAYMENTREQUEST_0_PAYMENTACTION'] = 'Sale';
-		$parameters['CANCELURL'] = 'https://ec2-52-25-14-252.us-west-2.compute.amazonaws.com/index.html';
+		$parameters['CANCELURL'] = $HOME_URL . '/index.html';
 
+		// Make the curl call and get the return as as a name value pair
 		$returnVal = executeFunction($parameters);
 
+		// If successful, redirect to PayPal site
 		if (isset($returnVal['ACK']) && $returnVal['ACK'] == 'Success')
 		{
 			$query = array(

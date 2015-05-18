@@ -1,8 +1,14 @@
 <?php
+
+	// PayPal redirects to this page after the SetExpressCheckout call is complete
+
+	// Unset any previous session variables
 	session_unset();
 	session_start();
 	require 'commonFunctions.php';
         $token = "";
+
+	// Get the token passed by PayPal
         if (isset($_REQUEST['token']))
         {
                 $token = $_REQUEST['token'];
@@ -14,11 +20,15 @@
 	{
 		$_SESSION['item'] = $getVar;
                 $method = "GetExpressCheckoutDetails";
+
+		// Set common parameters like user, password etc.
 		$parameters = setCommonParameters($method);
 		$parameters['TOKEN'] = $token;
 		
+		// Execute the call and get the return in an array as a name value pair
 		$returnVal = executeFunction($parameters);
 		
+		// If successful, set the session variables to carry over the values for the next call
 		if (isset($returnVal['ACK']) && $returnVal['ACK'] == 'Success')
 		{
                         foreach ($returnVal as $key => $value)
@@ -26,6 +36,8 @@
 				$_SESSION[$key] = $value;
 //                                echo "Key: $key and Value: $value<br>";
                         }
+
+// The below html gives the user a summary of his purchase and asks him/her to confirm or cancel
 ?>		
 <html>
 <head>

@@ -1,10 +1,11 @@
 <?php
 	require 'config.php';
 	
+
+	// Used to set the common parameters as a name value pair in an array
 	function setCommonParameters($method)
 	{
 		global $VERSION, $USER, $PWD, $SIGNATURE;
-//		echo "zxcv";
 		$parameters = array(
 			'USER' => $USER,
 			'PWD' => $PWD,
@@ -15,6 +16,7 @@
 		return $parameters;
 	}
 
+	// Set up the curl options and post parameters, execute the curl call, get the return and save them in an array as a name value pair
 	function executeFunction($parameters)
 	{
 		$curl = curl_init();
@@ -38,6 +40,7 @@
 		return $returnValues;
 	}
 
+	// If there is an error, print the array with the return values so its easier to debug
         function doErrorPrint($returnVal)
 	{
 		echo "There has been an error. Please check the return values<br>";

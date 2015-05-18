@@ -1,13 +1,21 @@
 <?php
+	// This page executes the last set of functions needed for the transaction to be finished
+
+	// Get the session variables
 	session_start();
+	
+	require 'commonFunctions.php';
+	
 	if ($_SESSION['TOKEN'] != "")
 	{
-        	require 'commonFunctions.php';
 		$method = "DoExpressCheckoutPayment";
+
+		// Set up common parameters like user, pwd etc
 		$parameters = setCommonParameters($method);
 	
 		$parameters['TOKEN'] = $_SESSION['TOKEN'];
 	
+		// Set unique parameters for each transaction
 		if ($_SESSION['item'] == "router")
 		{
                         $parameters['PAYERID'] = $_SESSION['PAYERID'];
@@ -37,6 +45,8 @@
 		}
 		else
 		{
+			// Change the method as it is not a DoExpressCheckoutPayment call anymore but reuse the same array instead of creating a new one
+			date_default_timezone_set('Asia/Singapore');
 			$parameters['METHOD'] = 'CreateRecurringPaymentsProfile';
 			$todaysDateArr = getdate();
 			$todaysDate = $todaysDateArr['year']."-".$todaysDateArr['mon']."-".$todaysDateArr['mday']."T".$todaysDateArr['hours'].":".$todaysDateArr['minutes'].":".$todaysDateArr['seconds']."Z";
@@ -49,6 +59,8 @@
 			$parameters['EMAIL'] = $_SESSION['EMAIL'] ;
 			 
 		}
+
+		// Execute the curl call and get the return parameters in an array as a name value pair
                 $returnVal = executeFunction($parameters);
                 if (isset($returnVal['ACK']) && $returnVal['ACK'] == 'Success')
                 {
